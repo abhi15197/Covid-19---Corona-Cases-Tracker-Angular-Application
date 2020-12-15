@@ -12,7 +12,7 @@ import { map } from 'rxjs/operators';
 })
 export class CountriesComponent implements OnInit {
 
-  data : GlobalDataSummary[];
+  data : any;
   countries : string[] = [];
   totalConfirmed = 0;
   totalActive = 0;
@@ -21,12 +21,19 @@ export class CountriesComponent implements OnInit {
   selectedCountryData : DateWiseData[]; 
   dateWiseData ;
   loading = true;
-  options: {
-    height : 500, 
-    animation:{
-      duration: 1000,
-      easing: 'out',
-    },
+  dataTable=[];
+  newData=[];
+  chart = {
+    LineChart : "LineChart", 
+    PieChart : "PieChart" ,
+    height: 500, 
+    options: {
+      animation:{
+        duration: 1000,
+        easing: 'out',
+      },
+      is3D: true
+    } 
   }
  
   constructor(private service : DataServiceService) { }
@@ -48,7 +55,7 @@ export class CountriesComponent implements OnInit {
     ).subscribe(
       {
         complete : ()=>{
-         this.updateValues('India')
+         this.updateValues('Afghanistan')
          this.loading = false;
         }
       }
@@ -59,13 +66,15 @@ export class CountriesComponent implements OnInit {
   }
 
   updateChart(){
-    let dataTable = [];
-    dataTable.push(["Date" , 'Cases'])
+    this.dataTable = [];
+    //this.dataTable.push(["Date" , 'Cases'])
     this.selectedCountryData.forEach(cs=>{
-      dataTable.push([cs.date , cs.cases])
+      this.dataTable.push([cs.date , cs.cases])
+      
+      
     })
 
-   
+    console.log(this.dataTable);
   }
 
   updateValues(country : string){
@@ -78,11 +87,42 @@ export class CountriesComponent implements OnInit {
         this.totalConfirmed = cs.confirmed
       }
     })
+    this.data.forEach(cs => {
+      
+    });
 
     this.selectedCountryData  = this.dateWiseData[country]
-    // console.log(this.selectedCountryData);
+   
     this.updateChart();
+    this.initChart(country);
     
+  }
+  initChart(country:string) {
+
+    this.newData = [];
+    // this.datatable.push(["Country", "Cases"])
+    
+    this.data.forEach(cs => {
+      let value :number ;
+      if(cs.country==country){
+        this.newData.push([
+          'confirmed', cs.confirmed
+        ])
+        this.newData.push([
+          'deaths', cs.deaths
+        ])
+        this.newData.push([
+          'recovered', cs.recovered
+        ])
+        this.newData.push([
+          'active', cs.active
+        ])
+        
+
+        
+    }})
+    console.log(this.newData);
+
   }
 
 }
